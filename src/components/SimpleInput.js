@@ -40,6 +40,11 @@ const SimpleInput = (props) => {
     // bad practise using ref: it manipulates the real DOM, using state is better!
     nameInputRef.current.value = '';
     setEnteredName('');
+    console.log(enteredName, enteredNameIsValid, enteredNameTouched);
+    // nameInputIsInvalid is true, if !enteredNameIsValid && enteredNameTouched,
+    // error message displays after sending the form, and input is reset...
+    // set touched to false as well, resetting input causes the form to be untouched, new form, error now disappears correctly
+    setEnteredNameTouched(false);
   }
 
   const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
