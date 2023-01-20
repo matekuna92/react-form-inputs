@@ -2,33 +2,27 @@ import { useState, useRef, useEffect } from 'react'
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState('');
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
   const [enteredNameTouched, setEnteredNameTouched] = useState(false);
   const nameInputRef = useRef();
 
   // settings enteredNameIsValid to true initially can cause problems, if we have e.g. a useEffect, because function
   // will run also on page load, when nothing entered yet
-  useEffect(() => {
+  /* useEffect(() => {
     if(enteredNameIsValid) {
       console.log('is valid');
     }
-  }, [enteredNameIsValid])
+  }, [enteredNameIsValid]) */
+
+  // now validity doesnt repeat code, handlers can rely on this condition, because it always holds the latest value *
+  const enteredNameIsValid = enteredName.trim() !== '';
 
   const nameChangeHandler = () => {
     // setEnteredName(event.target.value);
     setEnteredName(nameInputRef.current.value);
-
-    if(enteredName.trim() !== '') {
-      setEnteredNameIsValid(true);
-    }
   }
 
   const nameBlurHandler = (event) => {
     setEnteredNameTouched(true);    // input was touched before blur
-
-    if(enteredName.trim() === '') {
-      setEnteredNameIsValid(false);
-    }
   }
 
   const formSubmitHandler = (event) => {
@@ -36,13 +30,16 @@ const SimpleInput = (props) => {
 
     setEnteredNameTouched(true);
 
-    if(enteredName.trim() === '') {
-      setEnteredNameIsValid(false);
+    // * keep the check to prevent form submit with empty value
+    if(!enteredNameIsValid) {
       return;
     }
 
-	setEnteredName(true);
     console.log(enteredName);
+    // reset input
+    // bad practise using ref: it manipulates the real DOM, using state is better!
+    nameInputRef.current.value = '';
+    setEnteredName('');
   }
 
   const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
