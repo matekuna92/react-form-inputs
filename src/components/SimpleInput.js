@@ -98,7 +98,7 @@ const SimpleInput = (props) => {
       </div>
       <div className={phoneInputClasses}>
         <label htmlFor='phone'>Your Phone</label>
-        <input type='number' id='phone'
+        <input type='tel' id='phone'
           onChange={phoneChangeHandler}
           onBlur={phoneBlurHandler}
           ref={phoneInputRef}/>
