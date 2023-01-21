@@ -8,7 +8,6 @@ const useInput = (validateValue) => {
     const hasError = !valueIsValid && isTouched;
 
     const valueChangeHandler = (event) => {
-        // setEnteredName(event.target.value);
         setEnteredValue(event.target.value);
       }
     
@@ -16,8 +15,14 @@ const useInput = (validateValue) => {
         setIsTouched(true);    // input was touched before blur
       }
 
+      const reset = () => { 
+        setEnteredValue('');
+        setIsTouched(false);
+      }
+
     return {
         value: enteredValue,
+        isValid: valueIsValid,
         hasError: hasError,
         valueChangeHandler: valueChangeHandler,
         inputBlurHandler: inputBlurHandler

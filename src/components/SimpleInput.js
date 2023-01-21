@@ -1,26 +1,22 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
+import useInput from '../hooks/use-input';
 
 const SimpleInput = (props) => {
-  const [enteredName, setEnteredName] = useState('');
+  const { 
+    value: enteredName,
+    isValid: enteredNameIsValid,
+    hasError: nameInputHasError,
+    valueChangeHandler: nameChangedHandler,
+    inputBlurHandler: nameBlurHandler,
+    reset: resetNameInput } = useInput(value => value.trim() !== '');
+
   const [enteredPhoneNumber, setEnteredPhoneNumber] = useState('');
-  const [enteredNameTouched, setEnteredNameTouched] = useState(false);
   const [enteredPhoneTouched, setEnteredPhoneTouched] = useState(false);
-///  const [formIsValid, setFormIsValid] = useState(false);
   const nameInputRef = useRef();
   const phoneInputRef = useRef();
 
-  // settings enteredNameIsValid to true initially can cause problems, if we have e.g. a useEffect, because function
-  // will run also on page load, when nothing entered yet
-  /* useEffect(() => {
-    if(enteredNameIsValid) {
-      console.log('is valid');
-    }
-  }, [enteredNameIsValid]) */
-
   // now validity doesnt repeat code, handlers can rely on this condition, because it always holds the latest value *
-  const enteredNameIsValid = enteredName.trim() !== '';
   const enteredPhoneIsValid = enteredPhoneNumber.length > 11;
-  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
   const phoneInputIsInvalid = !enteredPhoneIsValid && enteredPhoneTouched;
 
  /// useEffect variation with FormIsValid state
@@ -40,15 +36,6 @@ const SimpleInput = (props) => {
   formIsValid = true;
  }
 
-  const nameChangeHandler = () => {
-    // setEnteredName(event.target.value);
-    setEnteredName(nameInputRef.current.value);
-  }
-
-  const nameBlurHandler = () => {
-    setEnteredNameTouched(true);    // input was touched before blur
-  }
-
   const phoneChangeHandler = () => {
     setEnteredPhoneNumber(phoneInputRef.current.value);
   }
@@ -60,7 +47,6 @@ const SimpleInput = (props) => {
   const formSubmitHandler = (event) => {
     event.preventDefault();
 
-    setEnteredNameTouched(true);
     setEnteredPhoneTouched(true);
 
     // * keep the check to prevent form submit with empty value
@@ -73,17 +59,16 @@ const SimpleInput = (props) => {
     // bad practise using ref: it manipulates the real DOM, using state is better!
     nameInputRef.current.value = '';
     phoneInputRef.current.value = '';
-    setEnteredName('');
+
+    // calling the function from custom hook, so no need to setName and setNameTouched
+    resetNameInput();
     setEnteredPhoneNumber('');
-    console.log(enteredName, enteredNameIsValid, enteredNameTouched);
-    // nameInputIsInvalid is true, if !enteredNameIsValid && enteredNameTouched,
     // error message displays after sending the form, and input is reset...
     // set touched to false as well, resetting input causes the form to be untouched, new form, error now disappears correctly
-    setEnteredNameTouched(false);
     setEnteredPhoneTouched(false);
   }
 
-  const nameInputClasses = `form-control ${nameInputIsInvalid ? 'invalid' : ''}`;
+  const nameInputClasses = `form-control ${nameInputHasError ? 'invalid' : ''}`;
   const phoneInputClasses = `form-control ${phoneInputIsInvalid ? 'invalid' : ''}`;
 
   return (
@@ -91,10 +76,10 @@ const SimpleInput = (props) => {
       <div className={nameInputClasses}>
         <label htmlFor='name'>Your Name</label>
         <input type='text' id='name'
-          onChange={nameChangeHandler}
+          onChange={nameChangedHandler}
           onBlur={nameBlurHandler}
           ref={nameInputRef}/>
-		  {nameInputIsInvalid && <p className='error-text'> Name must not be empty. </p>}
+		  {nameInputHasError && <p className='error-text'> Name must not be empty. </p>}
       </div>
       <div className={phoneInputClasses}>
         <label htmlFor='phone'>Your Phone</label>
