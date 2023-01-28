@@ -1,6 +1,11 @@
 import React, { useState, useRef } from 'react';
 
 const BasicForm = (props) => {
+  const [formInputsValidity, setFormInputsValidity] = useState({
+    firstName: true,
+    lastName: true,
+    email: true
+  });
   const isProperInput = value => value.trim() !== '';
   const isProperEmail = value => value.includes('@') && value.length > 7;
 
@@ -26,6 +31,11 @@ const BasicForm = (props) => {
     }
 
     console.log('form is valid!');
+    setFormInputsValidity({
+      firstName: isEnteredFirstNameValid,
+      lastName: isEnteredLastNameValid,
+      email: isEnteredEmailValid
+    });
   }
 
   return (
@@ -34,16 +44,18 @@ const BasicForm = (props) => {
         <div className='form-control'>
           <label htmlFor='name'>First Name</label>
           <input type='text' id='name' ref={firstNameInputRef}/>
-          {!isEnteredFirstNameValid && <p> Please enter a valid name. </p>}
+          {!formInputsValidity.firstName && <p> Please enter a valid first name. </p>}
         </div>
         <div className='form-control'>
           <label htmlFor='name'>Last Name</label>
           <input type='text' id='name' ref={lastNameInputRef}/>
+          {!formInputsValidity.lastName && <p> Please enter a valid last name. </p>}
         </div>
       </div>
       <div className='form-control'>
         <label htmlFor='name'>E-Mail Address</label>
         <input type='text' id='name' ref={emailInputRef}/>
+        {!formInputsValidity.email && <p> Please enter a valid email. </p>}
       </div>
       <div className='form-actions'>
         <button>Submit</button>
